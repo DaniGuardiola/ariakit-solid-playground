@@ -1,4 +1,4 @@
-import { type JSX, useContext } from "solid-js";
+import { type JSX, createEffect, useContext } from "solid-js";
 import { HeadingContext } from "./heading-context.tsx";
 import type { HeadingLevels } from "./utils.ts";
 
@@ -18,16 +18,20 @@ import type { HeadingLevels } from "./utils.ts";
  * </HeadingLevel>
  * ```
  */
-export function HeadingLevel({ level, children }: HeadingLevelProps) {
+export function HeadingLevel(props: HeadingLevelProps) {
   const contextLevel = useContext(HeadingContext);
+  createEffect(() => {
+    console.log({ contextLevel });
+    console.log(contextLevel?.());
+  });
   const nextLevel = () =>
     Math.max(
-      Math.min(level || (contextLevel?.() ?? 0) + 1, 6),
+      Math.min(props.level || (contextLevel?.() ?? 0) + 1, 6),
       1,
     ) as HeadingLevels;
   return (
     <HeadingContext.Provider value={nextLevel}>
-      {children}
+      {props.children}
     </HeadingContext.Provider>
   );
 }
