@@ -1,5 +1,10 @@
 import { combineProps } from "@solid-primitives/props";
-import { type ValidComponent, createMemo, useContext } from "solid-js";
+import {
+  type ValidComponent,
+  createMemo,
+  createSignal,
+  useContext,
+} from "solid-js";
 import { createHook, createInstance } from "../utils/system.tsx";
 import type { Options, Props } from "../utils/types.ts";
 import { HeadingContext } from "./heading-context.tsx";
@@ -24,22 +29,21 @@ type HTMLType = HTMLElementTagNameMap[TagName];
 export const useHeading = createHook<TagName, HeadingOptions>(
   function useHeading(props) {
     // TODO: does this need to be a callback ref that stores the element in a signal to be reactive? or in order for combineProps to work at all?
-    let ref!: HTMLType;
+    const [ref, setRef] = createSignal<HTMLType>();
     const level: HeadingLevels = useContext(HeadingContext) || 1;
-    const Element = `h${level}` as const;
-    // TODO: does this need to be reactive?
-    const tagName = ref.tagName.toLowerCase();
+    const Element = () => `h${level}` as const;
+    const tagName = () => ref()?.tagName.toLowerCase();
     const isNativeHeading = createMemo(
-      () => !!tagName && /^h\d$/.test(tagName),
+      () => !!tagName() && /^h\d$/.test(tagName()!),
       [tagName],
     );
 
     props = combineProps(
       {
         render: <Element />,
-        role: !isNativeHeading ? ("heading" as any) : undefined,
-        "aria-level": !isNativeHeading ? level : undefined,
-        ref,
+        role: () => (!isNativeHeading() ? ("heading" as any) : undefined),
+        "aria-level": () => (!isNativeHeading() ? level : undefined),
+        ref: setRef,
       },
       props,
     );
