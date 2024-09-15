@@ -19,19 +19,21 @@ type TagName = typeof TagName;
  */
 export const useFocusTrap = createHook<TagName, FocusTrapOptions>(
   function useFocusTrap(props) {
-    // TODO: is the order correct?
-    props = combineProps(props, {
-      "data-focus-trap": "",
-      tabIndex: 0,
-      "aria-hidden": true,
-      ...props,
-      style: {
-        // Prevents unintended scroll jumps.
-        position: "fixed",
-        top: 0,
-        left: 0,
+    props = combineProps(
+      {
+        "data-focus-trap": "",
+        tabIndex: 0,
+        "aria-hidden": true,
+        ...props,
+        style: {
+          // Prevents unintended scroll jumps.
+          position: "fixed",
+          top: 0,
+          left: 0,
+        },
       },
-    });
+      props,
+    );
 
     props = useVisuallyHidden(props);
 
