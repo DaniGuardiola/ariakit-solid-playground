@@ -4,9 +4,12 @@ import './App.css';
 import { Role } from './src/role/role';
 import { As } from './src/as/as';
 import { VisuallyHidden } from './src/visually-hidden/visually-hidden';
+import { FocusTrap, useFocusTrap } from './src/focus-trap/focus-trap';
 
 const App: Component = () => {
   const [dynamic, setDynamic] = createSignal(true);
+  let focusTargetRef!: HTMLButtonElement
+  let focusTarget2Ref!: HTMLButtonElement
   return (
     <div>
       <h1>LEGEND (color by tag)</h1>
@@ -46,6 +49,14 @@ const App: Component = () => {
       />
       <h2>Visually hidden (inspect)</h2>
       Here: <VisuallyHidden>Hello I'm hidden</VisuallyHidden>
+      <h2>Focus trap (tab into it)</h2>
+      <FocusTrap onFocus={() => focusTargetRef.focus()}>hidden</FocusTrap>
+      <button>decoy button</button>
+      <button ref={focusTargetRef!}>focus target!</button>
+      <h2>Focus trap but using hook</h2>
+      <Role.span {...useFocusTrap({onFocus: () => focusTarget2Ref.focus()})} />
+      <button>decoy button</button>
+      <button ref={focusTarget2Ref!}>focus target!</button>
     </div>
   );
 };

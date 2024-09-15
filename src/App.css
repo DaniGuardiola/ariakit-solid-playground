@@ -3,6 +3,11 @@ span,
 button {
   color: white;
   display: block;
+
+  &:focus {
+    outline: solid black 2px;
+    outline-offset: 2px;
+  }
 }
 
 p {
