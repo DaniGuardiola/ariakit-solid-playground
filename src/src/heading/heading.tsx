@@ -5,6 +5,7 @@ import {
   createSignal,
   useContext,
 } from "solid-js";
+import { Dynamic } from "solid-js/web";
 import { createHook, createInstance } from "../utils/system.tsx";
 import type { Options, Props } from "../utils/types.ts";
 import { HeadingContext } from "./heading-context.tsx";
@@ -34,17 +35,17 @@ export const useHeading = createHook<TagName, HeadingOptions>(
     const tagName = () => ref()?.tagName.toLowerCase();
     const isNativeHeading = createMemo(
       () => !!tagName() && /^h\d$/.test(tagName()!),
-      [tagName],
     );
 
     props = combineProps(
       {
-        render: <Element />,
+        // TODO: replace with LazyDynamic
+        render: <Dynamic component={Element()} />,
         role: () => (!isNativeHeading() ? ("heading" as any) : undefined),
         "aria-level": () => (!isNativeHeading() ? level : undefined),
-        ref: setRef,
+        // ref: setRef,
       },
-      props,
+      // props,
     );
 
     return props;
