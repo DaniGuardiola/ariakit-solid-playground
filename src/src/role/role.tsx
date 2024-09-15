@@ -68,9 +68,14 @@ export const useRole = createHook<TagName, RoleOptions>(
  * <Role render="button" renderProps={{ type: "button" }} />
  * ```
  */
-export const Role = function Role(props: any): JSX.Element {
-  return <Dynamic {...props} component={props.render ?? TagName} />;
-} as Component<RoleProps<"div">> & RoleElements;
+export const Role = function Role(props: RoleProps): JSX.Element {
+  return (
+    <Dynamic
+      {...props}
+      component={(props.render as ValidComponent) ?? TagName}
+    />
+  );
+} as Component<RoleProps> & RoleElements;
 
 Object.assign(
   Role,
