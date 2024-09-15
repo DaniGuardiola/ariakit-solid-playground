@@ -5,6 +5,8 @@ import { Role } from './src/role/role';
 import { As } from './src/as/as';
 import { VisuallyHidden } from './src/visually-hidden/visually-hidden';
 import { FocusTrap, useFocusTrap } from './src/focus-trap/focus-trap';
+import { HeadingLevel } from './src/heading/heading-level';
+import { Heading } from './src/heading/heading';
 
 const App: Component = () => {
   const [dynamic, setDynamic] = createSignal(true);
@@ -57,6 +59,13 @@ const App: Component = () => {
       <Role.span {...useFocusTrap({onFocus: () => focusTarget2Ref.focus()})} />
       <button>decoy button</button>
       <button ref={focusTarget2Ref!}>focus target!</button>
+      <h2>Headings</h2>
+      <HeadingLevel>
+        <Heading>H1?</Heading>
+        <HeadingLevel>
+          <Heading>H2?</Heading>
+        </HeadingLevel>
+      </HeadingLevel>
     </div>
   );
 };
