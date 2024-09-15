@@ -61,9 +61,9 @@ const App: Component = () => {
       <button ref={focusTarget2Ref!}>focus target!</button>
       <h2>Headings</h2>
       <HeadingLevel>
-        <Heading>H1?</Heading>
+        <Heading render={<As.div />}>H1?</Heading>
         <HeadingLevel>
-          <Heading>H2?</Heading>
+          <Heading class="a" data-test='outer' onClick={() => console.log("outer")} render={<As.div class="b" data-test='inner' onClick={() => console.log("inner")} />}>H2?</Heading>
         </HeadingLevel>
       </HeadingLevel>
     </div>
