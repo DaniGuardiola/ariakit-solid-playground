@@ -28,9 +28,8 @@ type HTMLType = HTMLElementTagNameMap[TagName];
  */
 export const useHeading = createHook<TagName, HeadingOptions>(
   function useHeading(props) {
-    // TODO: does this need to be a callback ref that stores the element in a signal to be reactive? or in order for combineProps to work at all?
     const [ref, setRef] = createSignal<HTMLType>();
-    const level: HeadingLevels = useContext(HeadingContext) || 1;
+    const level = useContext(HeadingContext) || (() => 1);
     const Element = () => `h${level}` as const;
     const tagName = () => ref()?.tagName.toLowerCase();
     const isNativeHeading = createMemo(

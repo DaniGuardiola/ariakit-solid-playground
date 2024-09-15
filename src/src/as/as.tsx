@@ -40,20 +40,19 @@ export const As = new Proxy(
     )) as unknown as JSX.Element;
   } as AsComponent & AsElements,
   {
-    get: (_, key: keyof JSX.IntrinsicElements) => {
-      let component = cache.get(key);
+    get: (_, Key: keyof JSX.IntrinsicElements) => {
+      let component = cache.get(Key);
       if (!component) {
         component = function AsElement(props: any): JSX.Element {
           return ((parentProps: unknown) => (
-            <Dynamic
+            <Key
               {...combineProps([parentProps, props], {
                 reverseEventHandlers: true,
               })}
-              component={key}
             />
           )) as unknown as JSX.Element;
         };
-        cache.set(key, component);
+        cache.set(Key, component);
       }
       return component;
     },

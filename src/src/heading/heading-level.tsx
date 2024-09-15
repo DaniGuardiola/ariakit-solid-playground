@@ -20,10 +20,11 @@ import type { HeadingLevels } from "./utils.ts";
  */
 export function HeadingLevel({ level, children }: HeadingLevelProps) {
   const contextLevel = useContext(HeadingContext);
-  const nextLevel = Math.max(
-    Math.min(level || contextLevel + 1, 6),
-    1,
-  ) as HeadingLevels;
+  const nextLevel = () =>
+    Math.max(
+      Math.min(level || (contextLevel?.() ?? 0) + 1, 6),
+      1,
+    ) as HeadingLevels;
   return (
     <HeadingContext.Provider value={nextLevel}>
       {children}

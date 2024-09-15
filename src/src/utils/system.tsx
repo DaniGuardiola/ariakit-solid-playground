@@ -1,6 +1,5 @@
 import type { AnyObject, EmptyObject } from "@ariakit/core/utils/types";
-import { type ValidComponent, splitProps } from "solid-js";
-import { Dynamic } from "solid-js/web";
+import { Show, type ValidComponent, splitProps } from "solid-js";
 import type { Role } from "../role/role.tsx";
 import type { HTMLProps, Hook, Options, Props } from "./types.ts";
 
@@ -10,15 +9,16 @@ import type { HTMLProps, Hook, Options, Props } from "./types.ts";
  * `wrapElement` props.
  */
 export function createInstance(
+  // TODO:
   Type: keyof typeof Role,
   props: Props<ValidComponent, Options>,
 ) {
   const [features, rest] = splitProps(props, ["render", "wrapElement"]);
   return (
-    <Dynamic
-      {...rest}
-      component={(features.render as ValidComponent) ?? Type}
-    />
+    <Show when={features.render} fallback={<Type {...rest} />}>
+      {/** @ts-expect-error - It's actually a function. */}
+      {(render) => render(rest)}
+    </Show>
   );
 }
 

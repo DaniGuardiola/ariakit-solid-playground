@@ -1,4 +1,4 @@
-import { createContext } from "solid-js";
+import { type Accessor, createContext } from "solid-js";
 import type { HeadingLevels } from "./utils.ts";
 
-export const HeadingContext = createContext<HeadingLevels | 0>(0);
+export const HeadingContext = createContext<Accessor<HeadingLevels>>();
