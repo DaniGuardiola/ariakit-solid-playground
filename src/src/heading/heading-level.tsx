@@ -20,10 +20,6 @@ import type { HeadingLevels } from "./utils.ts";
  */
 export function HeadingLevel(props: HeadingLevelProps) {
   const contextLevel = useContext(HeadingContext);
-  createEffect(() => {
-    console.log({ contextLevel });
-    console.log(contextLevel?.());
-  });
   const nextLevel = () =>
     Math.max(
       Math.min(props.level || (contextLevel?.() ?? 0) + 1, 6),
