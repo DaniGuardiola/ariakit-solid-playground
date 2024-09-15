@@ -1,4 +1,4 @@
-import { createSignal, type Component } from 'solid-js';
+import { createEffect, createSignal, type Component } from 'solid-js';
 
 import './App.css';
 import { Role } from './src/role/role';
@@ -12,6 +12,10 @@ const App: Component = () => {
   const [dynamic, setDynamic] = createSignal(true);
   let focusTargetRef!: HTMLButtonElement
   let focusTarget2Ref!: HTMLButtonElement
+  let headingRef!: HTMLDivElement
+  createEffect(() => {
+    console.log({headingRef})
+  })
   return (
     <div>
       <h1>LEGEND (color by tag)</h1>
@@ -61,7 +65,7 @@ const App: Component = () => {
       <button ref={focusTarget2Ref!}>focus target!</button>
       <h2>Headings</h2>
       <HeadingLevel>
-        <Heading render={<As.div />}>H1?</Heading>
+        <Heading ref={headingRef as HTMLHeadingElement} render={<As.div />} >H1?</Heading>
         <HeadingLevel>
           <Heading class="a" data-test='outer' onClick={() => console.log("outer")} render={<As.div class="b" data-test='inner' onClick={() => console.log("inner")} />}>H2?</Heading>
         </HeadingLevel>
