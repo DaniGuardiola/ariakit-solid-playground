@@ -68,6 +68,9 @@ const App: Component = () => {
         <Heading ref={headingRef as HTMLHeadingElement} render={<As.div />} >H1?</Heading>
         <HeadingLevel>
           <Heading class="a" data-test='outer' onClick={() => console.log("outer")} render={<As.div class="b" data-test='inner' onClick={() => console.log("inner")} />}>H2?</Heading>
+        <HeadingLevel>
+          <Heading>H3?</Heading>
+        </HeadingLevel>
         </HeadingLevel>
       </HeadingLevel>
     </div>
