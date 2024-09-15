@@ -1,40 +1,40 @@
-import { combineProps } from '@solid-primitives/props';
-import type { Component, JSX, ValidComponent } from 'solid-js';
-import { Dynamic } from 'solid-js/web';
-import { createHook } from '../utils/system.tsx';
-import type { Options, Props } from '../utils/types.ts';
+import { combineProps } from "@solid-primitives/props";
+import type { Component, JSX, ValidComponent } from "solid-js";
+import { Dynamic } from "solid-js/web";
+import { createHook } from "../utils/system.ts";
+import type { Options, Props } from "../utils/types.ts";
 
-const TagName = 'div' satisfies ValidComponent;
+const TagName = "div" satisfies ValidComponent;
 type TagName = typeof TagName;
 
 export const elements = [
-  'a',
-  'button',
-  'details',
-  'dialog',
-  'div',
-  'form',
-  'h1',
-  'h2',
-  'h3',
-  'h4',
-  'h5',
-  'h6',
-  'header',
-  'img',
-  'input',
-  'label',
-  'li',
-  'nav',
-  'ol',
-  'p',
-  'section',
-  'select',
-  'span',
-  'summary',
-  'textarea',
-  'ul',
-  'svg',
+  "a",
+  "button",
+  "details",
+  "dialog",
+  "div",
+  "form",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "header",
+  "img",
+  "input",
+  "label",
+  "li",
+  "nav",
+  "ol",
+  "p",
+  "section",
+  "select",
+  "span",
+  "summary",
+  "textarea",
+  "ul",
+  "svg",
 ] as const;
 
 type RoleElements = {
@@ -50,12 +50,12 @@ type RoleElements = {
  * <Role {...props} />
  * ```
  */
-export const useRole = createHook<TagName, RoleOptions>(function useRole(
-  props
-) {
-  // TODO: is this necessary?
-  return combineProps(props);
-});
+export const useRole = createHook<TagName, RoleOptions>(
+  function useRole(props) {
+    // TODO: is this necessary?
+    return combineProps(props);
+  },
+);
 
 // TODO: implement `wrapElement` prop.
 /**
@@ -70,15 +70,14 @@ export const useRole = createHook<TagName, RoleOptions>(function useRole(
  */
 export const Role = function Role(props: any): JSX.Element {
   return <Dynamic {...props} component={props.render ?? TagName} />;
-} as Component<RoleProps<'div'>> & RoleElements;
+} as Component<RoleProps<"div">> & RoleElements;
 
 Object.assign(
   Role,
   elements.reduce((acc, element) => {
     acc[element] = function Role(
-      props: RoleProps<typeof element>
+      props: RoleProps<typeof element>,
     ): JSX.Element {
-      console.log(props);
       return (
         <Dynamic
           {...props}
@@ -87,7 +86,7 @@ Object.assign(
       );
     };
     return acc;
-  }, {} as RoleElements)
+  }, {} as RoleElements),
 );
 
 export interface RoleOptions<_T extends ValidComponent = TagName>

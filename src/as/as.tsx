@@ -1,13 +1,13 @@
-import { combineProps } from '@solid-primitives/props';
-import type { Component, ComponentProps, JSX, ValidComponent } from 'solid-js';
-import { Dynamic } from 'solid-js/web';
+import { combineProps } from "@solid-primitives/props";
+import type { Component, ComponentProps, JSX, ValidComponent } from "solid-js";
+import { Dynamic } from "solid-js/web";
 
 type AsElements = {
   [K in keyof JSX.IntrinsicElements]: Component<ComponentProps<K>>;
 };
 
 type AsComponent = <T extends Component<any>, P = ComponentProps<T>>(
-  props: AsProps<T, P>
+  props: AsProps<T, P>,
 ) => JSX.Element;
 
 const cache = new Map<string, Component<any>>();
@@ -57,7 +57,7 @@ export const As = new Proxy(
       }
       return component;
     },
-  }
+  },
 );
 
 export type AsProps<T extends ValidComponent, P = ComponentProps<T>> = {

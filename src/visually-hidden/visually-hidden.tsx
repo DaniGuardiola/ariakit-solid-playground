@@ -1,9 +1,9 @@
-import { combineProps } from '@solid-primitives/props';
-import type { ValidComponent } from 'solid-js';
-import { createElement, createHook } from '../utils/system.tsx';
-import type { Options, Props } from '../utils/types.ts';
+import { combineProps } from "@solid-primitives/props";
+import type { ValidComponent } from "solid-js";
+import { createHook, createInstance } from "../utils/system.ts";
+import type { Options, Props } from "../utils/types.ts";
 
-const TagName = 'span' satisfies ValidComponent;
+const TagName = "span" satisfies ValidComponent;
 type TagName = typeof TagName;
 
 /**
@@ -25,18 +25,18 @@ export const useVisuallyHidden = createHook<TagName, VisuallyHiddenOptions>(
     props = combineProps(props, {
       style: {
         border: 0,
-        clip: 'rect(0 0 0 0)',
-        height: '1px',
-        margin: '-1px',
-        overflow: 'hidden',
+        clip: "rect(0 0 0 0)",
+        height: "1px",
+        margin: "-1px",
+        overflow: "hidden",
         padding: 0,
-        position: 'absolute',
-        whiteSpace: 'nowrap',
-        width: '1px',
+        position: "absolute",
+        whiteSpace: "nowrap",
+        width: "1px",
       },
     });
     return props;
-  }
+  },
 );
 
 /**
@@ -52,7 +52,7 @@ export const useVisuallyHidden = createHook<TagName, VisuallyHiddenOptions>(
  */
 export function VisuallyHidden(props: VisuallyHiddenProps) {
   const htmlProps = useVisuallyHidden(props);
-  return createElement(TagName, htmlProps);
+  return createInstance(TagName, htmlProps);
 }
 
 export interface VisuallyHiddenOptions<_T extends ValidComponent = TagName>

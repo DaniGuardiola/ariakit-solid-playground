@@ -1,5 +1,5 @@
-import type { AnyObject, EmptyObject } from '@ariakit/core/utils/types';
-import type { ComponentProps, JSX, ValidComponent } from 'solid-js';
+import type { AnyObject, EmptyObject } from "@ariakit/core/utils/types";
+import type { ComponentProps, JSX, ValidComponent } from "solid-js";
 
 /**
  * Custom props including the `render` prop.
@@ -26,7 +26,7 @@ export interface Options {
  */
 export type HTMLProps<
   T extends ValidComponent,
-  P extends AnyObject = EmptyObject
+  P extends AnyObject = EmptyObject,
 > = Omit<ComponentProps<T>, keyof P> & {
   [index: `data-${string}`]: unknown;
 };
@@ -38,7 +38,7 @@ export type HTMLProps<
  */
 export type Props<
   T extends ValidComponent,
-  P extends AnyObject = EmptyObject
+  P extends AnyObject = EmptyObject,
 > = P & HTMLProps<T, P>;
 
 /**
@@ -51,7 +51,7 @@ export type Props<
  */
 export type Hook<
   T extends ValidComponent,
-  P extends AnyObject = EmptyObject
+  P extends AnyObject = EmptyObject,
 > = <ElementType extends ValidComponent = T>(
-  props?: Props<ElementType, P>
+  props?: Props<ElementType, P>,
 ) => HTMLProps<ElementType, P>;
