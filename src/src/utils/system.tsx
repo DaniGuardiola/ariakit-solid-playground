@@ -22,12 +22,12 @@ export function createInstance(
   let tree = withRender;
   if (features.wrapElement) {
     for (const element of features.wrapElement) {
+      const children = tree;
       tree = () => (
         // TODO: replace with LazyDynamic
-        <Dynamic component={element as ValidComponent}>{tree()}</Dynamic>
+        <Dynamic component={element as ValidComponent}>{children()}</Dynamic>
       );
     }
-    return tree();
   }
   return tree();
 }
