@@ -7,6 +7,8 @@ import { VisuallyHidden } from './src/visually-hidden/visually-hidden';
 import { FocusTrap, useFocusTrap } from './src/focus-trap/focus-trap';
 import { HeadingLevel } from './src/heading/heading-level';
 import { Heading } from './src/heading/heading';
+import { Group } from './src/group/group';
+import { GroupLabel } from './src/group/group-label';
 
 const App: Component = () => {
   const [dynamic, setDynamic] = createSignal(true);
@@ -73,6 +75,10 @@ const App: Component = () => {
         </HeadingLevel>
         </HeadingLevel>
       </HeadingLevel>
+      <h2>Group</h2>
+      <Group>
+        <GroupLabel>Label</GroupLabel>
+      </Group>
     </div>
   );
 };
