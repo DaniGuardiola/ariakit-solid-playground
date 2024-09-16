@@ -9,6 +9,7 @@ import { HeadingLevel } from './src/heading/heading-level';
 import { Heading } from './src/heading/heading';
 import { Group } from './src/group/group';
 import { GroupLabel } from './src/group/group-label';
+import { Separator } from './src/separator/separator';
 
 const App: Component = () => {
   const [dynamic, setDynamic] = createSignal(true);
@@ -82,6 +83,9 @@ const App: Component = () => {
       <Group>
         <GroupLabel id="my-id">Label with id</GroupLabel>
       </Group>
+      <h2>Separator</h2>
+      <Separator />
+      <Separator orientation='vertical' />
     </div>
   );
 };
