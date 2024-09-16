@@ -6,6 +6,7 @@ import {
   useContext,
 } from "solid-js";
 import { useId } from "../utils/hooks.ts";
+import { stableAccessor } from "../utils/misc.ts";
 import { createHook, createInstance } from "../utils/system.tsx";
 import type { Options, Props } from "../utils/types.ts";
 import { GroupLabelContext } from "./group-label-context.tsx";
@@ -28,7 +29,7 @@ type TagName = typeof TagName;
 export const useGroupLabel = createHook<TagName, GroupLabelOptions>(
   function useGroupLabel(props) {
     const setLabelId = useContext(GroupLabelContext);
-    const id = useId(() => props.id);
+    const id = useId(stableAccessor(props, (p) => p.id));
 
     createEffect(() => {
       setLabelId?.(id());
