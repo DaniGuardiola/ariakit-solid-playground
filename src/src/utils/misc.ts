@@ -5,7 +5,7 @@
  * let value = 0;
  * const accessor = stableAccessor(value, (v) => v + 1);
  * value = 100;
- * console.log(accessor()); // 1
+ * accessor(); // 1
  */
 export function stableAccessor<T, U>(
   value: T,
