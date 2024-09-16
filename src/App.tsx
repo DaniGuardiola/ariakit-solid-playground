@@ -79,6 +79,9 @@ const App: Component = () => {
       <Group>
         <GroupLabel>Label</GroupLabel>
       </Group>
+      <Group>
+        <GroupLabel id="my-id">Label with id</GroupLabel>
+      </Group>
     </div>
   );
 };
