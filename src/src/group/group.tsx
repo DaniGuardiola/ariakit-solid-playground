@@ -1,4 +1,3 @@
-import { removeUndefinedValues } from "@ariakit/core/utils/misc";
 import { combineProps } from "@solid-primitives/props";
 import { type ValidComponent, createSignal } from "solid-js";
 import { As } from "../as/as.tsx";
@@ -39,7 +38,9 @@ export const useGroup = createHook<TagName, GroupOptions>(
       props,
     );
 
-    return removeUndefinedValues(props);
+    // TODO: is this still necessary in Solid?
+    // return removeUndefinedValues(props);
+    return props;
   },
 );
 
