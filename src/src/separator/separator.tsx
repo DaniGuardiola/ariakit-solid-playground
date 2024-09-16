@@ -20,7 +20,7 @@ export const useSeparator = createHook<TagName, SeparatorOptions>(
   function useSeparator(props) {
     const p = extractPropsWithDefaults(props, (p) => (props = p), {
       orientation: "horizontal",
-    } as const);
+    });
 
     props = combineProps(
       {

@@ -24,6 +24,8 @@ export type ExtractPropsWithDefaults<T, D extends { [P in keyof T]?: T[P] }> = {
     : never;
 };
 
+// TODO: explore integrating this into createHook or creating some sort of
+// intermediate utility.
 /**
  * Extracts props from a props object and applies defaults to them. The
  * rest of the props are set through the provided setter . To extract a
@@ -38,7 +40,7 @@ export type ExtractPropsWithDefaults<T, D extends { [P in keyof T]?: T[P] }> = {
  */
 export function extractPropsWithDefaults<
   T extends Record<any, any>,
-  D extends { [P in keyof T]?: T[P] },
+  const D extends { [P in keyof T]?: T[P] },
 >(
   props: T,
   setter: (props: T) => void,
