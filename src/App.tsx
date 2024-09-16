@@ -10,11 +10,13 @@ import { Heading } from './src/heading/heading';
 import { Group } from './src/group/group';
 import { GroupLabel } from './src/group/group-label';
 import { Separator } from './src/separator/separator';
+import { FocusTrapRegion } from './src/focus-trap/focus-trap-region';
 
 const App: Component = () => {
   const [dynamic, setDynamic] = createSignal(true);
   let focusTargetRef!: HTMLButtonElement
   let focusTarget2Ref!: HTMLButtonElement
+  const [focusTrapRegionEnabled, setFocusTrapRegionEnabled] = createSignal(false)
   let headingRef!: HTMLDivElement
   createEffect(() => {
     console.log({headingRef})
@@ -66,6 +68,13 @@ const App: Component = () => {
       <Role.span {...useFocusTrap({onFocus: () => focusTarget2Ref.focus()})} />
       <button>decoy button</button>
       <button ref={focusTarget2Ref!}>focus target!</button>
+      <h2>Focus trap region</h2>
+      <button onClick={() => setFocusTrapRegionEnabled(v => !v)}>{focusTrapRegionEnabled() ? "Currently enabled, click to disable":"Currently disabled, click to enable"}</button>
+      <FocusTrapRegion enabled={focusTrapRegionEnabled()}>
+        <button>click me</button>
+        <button>trap focus</button>
+        <button disabled>disabled button</button>
+      </FocusTrapRegion>
       <h2>Headings</h2>
       <HeadingLevel>
         <Heading ref={headingRef as HTMLHeadingElement} render={<As.div />} >H1?</Heading>
