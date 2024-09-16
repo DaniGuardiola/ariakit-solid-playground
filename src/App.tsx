@@ -36,13 +36,13 @@ const App: Component = () => {
       <Role.span
         render={<As.button>span + button (with children)</As.button>}
       />
-      <Role.span render={<As.button>i show up (children override)</As.button>}>
-        i won't show up
+      <Role.span render={<As.button>if you're reading this, it worked (children override)</As.button>}>
+        this shouldn't be visible
       </Role.span>
-      <Role.span data-test="if you're reading this, it worked" render={<As.button data-test={undefined}>data-test: undefined</As.button>} />
+      <Role.span data-test="if you're reading this, it worked" render={<As.button data-test={undefined}>data-test: undefined (inspect me)</As.button>} />
       <Role.button>button</Role.button>
       <Role.button render={<As.span>button + span</As.span>} />
-      <h2>Class</h2>
+      <h2>Render with "As" - class merging</h2>
       <Role.button class="a" render={<As.button class="a" />}>
         (i should have ".a")
       </Role.button>
@@ -52,13 +52,15 @@ const App: Component = () => {
       <Role.button class="a" render={<As.button class="b" />}>
         (i should have ".a" and ".b")
       </Role.button>
-      <h2>Reactive tag (click to toggle)</h2>
+      <h2>Render with "As" - reactive tag (click to toggle)</h2>
       <Role.button
         onClick={() => setDynamic((value) => !value)}
         render={
           dynamic() ? <As.span>button + span</As.span> : <As.p>button + p</As.p>
         }
       />
+      <h2>Render with function</h2>
+      <Role.div data-test="a" render={props => <button type="button" {...props} data-test={`${props['data-test']} + b`} />} >I should be a button with type="button" and data-test="a + b"</Role.div>
       <h2>Visually hidden (inspect)</h2>
       Here: <VisuallyHidden>Hello I'm hidden</VisuallyHidden>
       <h2>Focus trap (tab into it)</h2>
