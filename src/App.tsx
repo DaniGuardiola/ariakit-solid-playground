@@ -28,7 +28,7 @@ const App: Component = () => {
       <span>span</span>
       <button>button</button>
       <h1>EXAMPLES</h1>
-      <h2>Tags</h2>
+      <h2>Render with "As"</h2>
       <Role.span>span</Role.span>
       <Role.span render={<As.button />}>
         span (with children) + button
@@ -39,6 +39,7 @@ const App: Component = () => {
       <Role.span render={<As.button>i show up (children override)</As.button>}>
         i won't show up
       </Role.span>
+      <Role.span data-test="if you're reading this, it worked" render={<As.button data-test={undefined}>data-test: undefined</As.button>} />
       <Role.button>button</Role.button>
       <Role.button render={<As.span>button + span</As.span>} />
       <h2>Class</h2>
