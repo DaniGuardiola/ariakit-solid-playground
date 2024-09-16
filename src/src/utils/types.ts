@@ -1,15 +1,21 @@
 import type { AnyObject, EmptyObject } from "@ariakit/core/utils/types";
 import type {
+  Component,
   ComponentProps,
   JSX,
-  ParentComponent,
+  ParentProps,
   ValidComponent,
 } from "solid-js";
 
 /**
  * A value passed to the `wrapElement` prop.
  */
-export type WrapElementValue = JSX.Element | ParentComponent;
+export type Renderable<P extends AnyObject> = JSX.Element | Component<P>;
+
+/**
+ * A value passed to the `wrapElement` prop.
+ */
+export type WrapElementValue = Renderable<ParentProps>;
 
 /**
  * The `wrapElement` prop.
@@ -30,7 +36,7 @@ export interface Options {
    * Check out the [Composition](https://solid.ariakit.org/guide/composition) guide
    * for more details.
    */
-  render?: JSX.Element; // TODO: function support
+  render?: Renderable<JSX.HTMLAttributes<any>>; // TODO: function support
 }
 
 /**
