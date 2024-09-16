@@ -64,7 +64,7 @@ export const useFocusTrapRegion = createHook<TagName, FocusTrapRegionOptions>(
         </>
       );
     }
-    // TODO: experiment with accepting inline component function here
+    // TODO: experiment with accepting inline component functions here
     // instead of "As".
     props = useWrapElement(props, <As component={Wrapper} />);
 
