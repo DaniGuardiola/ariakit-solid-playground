@@ -28,7 +28,7 @@ type TagName = typeof TagName;
 export const useGroupLabel = createHook<TagName, GroupLabelOptions>(
   function useGroupLabel(props) {
     const setLabelId = useContext(GroupLabelContext);
-    const id = () => "bruh";
+    const id = useId(() => props.id);
 
     createEffect(() => {
       setLabelId?.(id());
