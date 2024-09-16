@@ -8,7 +8,8 @@ import type {
 } from "solid-js";
 
 /**
- * A value passed to the `wrapElement` prop.
+ * A value that can be rendered when passed to the `render` prop or the
+ * `wrapElement` prop.
  */
 export type Renderable<P extends AnyObject> = JSX.Element | Component<P>;
 
@@ -36,7 +37,7 @@ export interface Options {
    * Check out the [Composition](https://solid.ariakit.org/guide/composition) guide
    * for more details.
    */
-  render?: Renderable<JSX.HTMLAttributes<any>>; // TODO: function support
+  render?: Renderable<JSX.HTMLAttributes<any>>;
 }
 
 /**
