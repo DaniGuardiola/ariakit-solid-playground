@@ -2,7 +2,6 @@ import { combineProps } from "@solid-primitives/props";
 import { type ValidComponent, createSignal } from "solid-js";
 import { As } from "../as/as.tsx";
 import { useWrapElement } from "../utils/hooks.ts";
-// import { useWrapElement } from "../utils/hooks.ts";
 import { createHook, createInstance } from "../utils/system.tsx";
 import type { Options, Props } from "../utils/types.ts";
 import { GroupLabelContext } from "./group-label-context.tsx";
