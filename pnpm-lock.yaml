@@ -11,6 +11,9 @@ dependencies:
   '@solid-primitives/props':
     specifier: ^3.1.11
     version: 3.1.11(solid-js@1.8.22)
+  '@solid-primitives/utils':
+    specifier: ^6.2.3
+    version: 6.2.3(solid-js@1.8.22)
   solid-js:
     specifier: ^1.8.22
     version: 1.8.22
