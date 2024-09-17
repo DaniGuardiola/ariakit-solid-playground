@@ -11,6 +11,7 @@ import { Group } from './src/group/group';
 import { GroupLabel } from './src/group/group-label';
 import { Separator } from './src/separator/separator';
 import { FocusTrapRegion } from './src/focus-trap/focus-trap-region';
+import { Portal } from './src/portal/portal';
 
 const App: Component = () => {
   const [dynamic, setDynamic] = createSignal(true);
@@ -21,6 +22,7 @@ const App: Component = () => {
   createEffect(() => {
     console.log({headingRef})
   })
+  let portalTargetRef!: HTMLDivElement
   return (
     <div>
       <h1>LEGEND (color by tag)</h1>
@@ -78,6 +80,9 @@ const App: Component = () => {
         <button>trap focus</button>
         <button disabled>disabled button</button>
       </FocusTrapRegion>
+      <h2>Portal (target)</h2>
+      <div>Target below:</div>
+      <div data-portal-target ref={portalTargetRef} />
       <h2>Headings</h2>
       <HeadingLevel>
         <Heading ref={headingRef as HTMLHeadingElement} render={<As.div />} >H1?</Heading>
@@ -98,6 +103,17 @@ const App: Component = () => {
       <h2>Separator</h2>
       <Separator />
       <Separator orientation='vertical' />
+      <h2>Portal (declaration)</h2>
+      <Portal portalElement={() => portalTargetRef}>
+        <div data-inside-portal>hello! i am portalled!!!</div>
+      </Portal>
+      <Portal portalElement={() => portalTargetRef}>
+        hello! i am portalled too!!!
+      </Portal>
+      <h2>Portal (disabled)</h2>
+      <Portal portal={false} portalElement={portalTargetRef}>
+        hello! i am NOT portalled!!!
+      </Portal>
     </div>
   );
 };
