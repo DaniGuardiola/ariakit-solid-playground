@@ -110,6 +110,9 @@ const App: Component = () => {
       <Portal portalElement={() => portalTargetRef}>
         hello! i am portalled too!!!
       </Portal>
+      <Portal>
+        hello! i am portalled to body!!!
+      </Portal>
       <h2>Portal (disabled)</h2>
       <Portal portal={false} portalElement={portalTargetRef}>
         hello! i am NOT portalled!!!
