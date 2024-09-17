@@ -58,6 +58,7 @@ export const usePortal = createHook<TagName, PortalOptions>(
       // FIXME: get context
       const context = useContext(PortalContext);
       // FIXME: create internal portal and anchor portal refs
+      const portalNode = createRef<HTMLElement>();
       const anchorPortalNode = createRef<HTMLElement>();
 
       // FIXME: create positional refs
@@ -74,6 +75,7 @@ export const usePortal = createHook<TagName, PortalOptions>(
       }
       createEffect(() => {
         debugSet(ref, "ref");
+        debugSet(portalNode, "portalNode");
         debugSet(anchorPortalNode, "anchorPortalNode");
         debugSet(outerBeforeNode, "outerBeforeNode");
         debugSet(innerBeforeNode, "innerBeforeNode");
@@ -102,7 +104,7 @@ export const usePortal = createHook<TagName, PortalOptions>(
       // element are tabbable only when the portal has already been focused,
       // either by tabbing into a focus trap element outside or using the mouse.
       createEffect(() => {
-        const portalNodeValue = ref.value;
+        const portalNodeValue = portalNode.value;
         const { preserveTabOrder } = options;
         if (!portalNodeValue) return;
         if (!preserveTabOrder) return;
@@ -136,20 +138,20 @@ export const usePortal = createHook<TagName, PortalOptions>(
           // While the portal node is not in the DOM, we need to pass the
           // current context to the portal context, otherwise it's going to
           // reset to the body element on nested portals.
-          <PortalContext.Provider value={ref.value || context}>
+          <PortalContext.Provider value={portalNode.value || context}>
             {wrapperProps.children}
           </PortalContext.Provider>
         );
 
         let element = () => (
           <>
-            <Show when={options.preserveTabOrder && ref.value}>
+            <Show when={options.preserveTabOrder && portalNode.value}>
               <FocusTrap
                 ref={innerBeforeNode.set}
                 data-focus-trap={props.id}
                 class="__focus-trap-inner-before"
                 onFocus={(event) => {
-                  if (isFocusEventOutside(event, ref.value)) {
+                  if (isFocusEventOutside(event, portalNode.value)) {
                     queueFocus(getNextTabbable());
                   } else {
                     queueFocus(outerBeforeNode.value);
@@ -158,13 +160,13 @@ export const usePortal = createHook<TagName, PortalOptions>(
               />
             </Show>
             {baseElement()}
-            <Show when={options.preserveTabOrder && ref.value}>
+            <Show when={options.preserveTabOrder && portalNode.value}>
               <FocusTrap
                 ref={innerAfterNode.set}
                 data-focus-trap={props.id}
                 class="__focus-trap-inner-after"
                 onFocus={(event) => {
-                  if (isFocusEventOutside(event, ref.value)) {
+                  if (isFocusEventOutside(event, portalNode.value)) {
                     queueFocus(getPreviousTabbable());
                   } else {
                     queueFocus(outerAfterNode.value);
@@ -175,12 +177,8 @@ export const usePortal = createHook<TagName, PortalOptions>(
           </>
         );
         element = stableAccessor(element, (el) => (
-          <Show when={ref.value} fallback={el()}>
-            <SolidPortal
-              // TODO: potentially use mergeRefs, but make sure it's not too much extra code
-              {...combineProps({ ref: ref.set }, { ref: props.ref })}
-              mount={ref.value}
-            >
+          <Show when={portalNode.value} fallback={el()}>
+            <SolidPortal ref={portalNode.set} mount={portalNode.value}>
               {el()}
             </SolidPortal>
           </Show>
@@ -188,7 +186,7 @@ export const usePortal = createHook<TagName, PortalOptions>(
 
         let preserveTabOrderElement = () => (
           <>
-            <Show when={options.preserveTabOrder && ref.value}>
+            <Show when={options.preserveTabOrder && portalNode.value}>
               <FocusTrap
                 ref={outerBeforeNode.set}
                 data-focus-trap={props.id}
@@ -200,7 +198,10 @@ export const usePortal = createHook<TagName, PortalOptions>(
                   // the previous tabbable element outside the portal.
                   const fromOuter =
                     event.relatedTarget === outerAfterNode.value;
-                  if (!fromOuter && isFocusEventOutside(event, ref.value)) {
+                  if (
+                    !fromOuter &&
+                    isFocusEventOutside(event, portalNode.value)
+                  ) {
                     queueFocus(innerBeforeNode.value);
                   } else {
                     queueFocus(getPreviousTabbable());
@@ -211,16 +212,19 @@ export const usePortal = createHook<TagName, PortalOptions>(
             <Show when={options.preserveTabOrder}>
               {/* We're using position: fixed here so that the browser doesn't
               add margin to the element when setting gap on a parent element. */}
-              <span aria-owns={ref.value?.id} style={{ position: "fixed" }} />
+              <span
+                aria-owns={portalNode.value?.id}
+                style={{ position: "fixed" }}
+              />
             </Show>
 
-            <Show when={options.preserveTabOrder && ref.value}>
+            <Show when={options.preserveTabOrder && portalNode.value}>
               <FocusTrap
                 ref={outerAfterNode.set}
                 data-focus-trap={props.id}
                 class="__focus-trap-outer-after"
                 onFocus={(event) => {
-                  if (isFocusEventOutside(event, ref.value)) {
+                  if (isFocusEventOutside(event, portalNode.value)) {
                     queueFocus(innerAfterNode.value);
                   } else {
                     const nextTabbable = getNextTabbable();
@@ -264,7 +268,7 @@ export const usePortal = createHook<TagName, PortalOptions>(
             }
           >
             <Match when={!options.portal}>{baseElement()}</Match>
-            <Match when={!ref.value}>
+            <Match when={!portalNode.value}>
               {/* TODO: (react) these docs say "div" but it's a "span", what's up with that? */}
               {/* If the element should be rendered within a portal, but the portal
               node is not yet in the DOM, we'll return an empty div element. We
