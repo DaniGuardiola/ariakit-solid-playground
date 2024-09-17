@@ -36,6 +36,12 @@ function getPortalElement(
   return portalElement;
 }
 
+function getRandomId(prefix = "id") {
+  return `${prefix ? `${prefix}-` : ""}${Math.random()
+    .toString(36)
+    .substr(2, 6)}`;
+}
+
 /**
  * Returns props to create a `Portal` component.
  * @see https://solid.ariakit.org/components/portal
@@ -80,7 +86,12 @@ export const usePortal = createHook<TagName, PortalOptions>(
           const rootElement = getRootElement(element);
           rootElement.append(portalEl);
         }
-        // TODO: add support for ids
+        // If the portal element doesn't have an id already, set one.
+        if (!portalEl.id) {
+          // Use the element's id so rendering <Portal id="some-id" /> will
+          // produce predictable results.
+          portalEl.id = element.id ? `portal/${element.id}` : getRandomId();
+        }
         // Set the internal portal node state and the portalRef prop.
         portalNode.set(portalEl);
         options.portalRef?.(portalEl);
