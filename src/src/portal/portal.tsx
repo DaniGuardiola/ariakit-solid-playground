@@ -1,13 +1,39 @@
+import { getDocument } from "@ariakit/core/utils/dom";
 import { combineProps } from "@solid-primitives/props";
 import { mergeRefs } from "@solid-primitives/refs";
-import type { ValidComponent } from "solid-js";
-import { Show, Portal as SolidPortal } from "solid-js/web";
-import { wrapInstance } from "../utils/misc.ts";
+import {
+  Match,
+  Switch,
+  type ValidComponent,
+  createEffect,
+  onCleanup,
+} from "solid-js";
+import { Portal as SolidPortal } from "solid-js/web";
+import { createRef, wrapInstance } from "../utils/misc.ts";
 import { createHook, createInstance, withOptions } from "../utils/system.tsx";
 import type { Options, Props } from "../utils/types.ts";
 
 const TagName = "div" satisfies ValidComponent;
 type TagName = typeof TagName;
+type HTMLType = HTMLElementTagNameMap[TagName];
+
+function getRootElement(element?: Element | null) {
+  return getDocument(element).body;
+}
+
+function getPortalElement(
+  element: HTMLElement,
+  portalElement: PortalOptions["portalElement"],
+) {
+  if (!portalElement) {
+    return getDocument(element).createElement("div");
+  }
+  // TODO: (react) shouldn't this fall back to the return above as well?
+  if (typeof portalElement === "function") {
+    return portalElement(element);
+  }
+  return portalElement;
+}
 
 /**
  * Returns props to create a `Portal` component.
@@ -29,20 +55,69 @@ export const usePortal = createHook<TagName, PortalOptions>(
       ref: undefined,
     },
     function usePortal(props, options) {
-      const refProp = mergeRefs(options.ref) as (element: HTMLElement) => void;
+      const ref = createRef<HTMLType>();
+      const refProp = mergeRefs(ref.set, options.ref);
+      const portalNode = createRef<HTMLElement>();
+
+      // Create the portal node and attach it to the DOM.
+      createEffect(() => {
+        const element = ref.value;
+        if (!element || !options.portal) {
+          portalNode.reset();
+          return;
+        }
+        const portalEl = getPortalElement(element, options.portalElement);
+        // TODO: (original) Warn about portals as the document.body element.
+        if (!portalEl) {
+          portalNode.reset();
+          return;
+        }
+        const isPortalInDocument = portalEl.isConnected;
+        if (!isPortalInDocument) {
+          // TODO: add context support?
+          // const rootElement = context ?? getRootElement(element);
+          const rootElement = getRootElement(element);
+          rootElement.append(portalEl);
+        }
+        // TODO: add support for ids
+        // Set the internal portal node state and the portalRef prop.
+        portalNode.set(portalEl);
+        options.portalRef?.(portalEl);
+        // If the portal element was already in the document, we don't need to
+        // remove it when the element is unmounted, so we just return.
+        if (isPortalInDocument) return;
+        // Otherwise, we need to remove the portal from the DOM.
+        onCleanup(() => {
+          portalEl.remove();
+          options.portalRef?.(undefined);
+        });
+      });
 
       props = wrapInstance(props, (wrapperProps) => {
+        // TODO: add context support
         return (
-          <Show when={options.portal} fallback={wrapperProps.children}>
-            <SolidPortal ref={refProp}>{props.children}</SolidPortal>
-          </Show>
+          <Switch
+            fallback={() => {
+              throw new Error("this should never happen");
+            }}
+          >
+            <Match when={!options.portal}>{wrapperProps.children}</Match>
+            <Match when={options.portal && !portalNode.value}>
+              <p>TODO: span thingy?</p>
+            </Match>
+            <Match when={options.portal && portalNode.value}>
+              {/* TODO: preserveTabOrder thing */}
+              <SolidPortal ref={refProp}>{props.children}</SolidPortal>
+            </Match>
+          </Switch>
         );
+        // TODO: preserveTabOrderElement and the rest
       });
 
       props = combineProps(
         {
-          // is this necessary? since when portalled, this won't render anyway right?
-          ref: (element: HTMLElement) => !options.portal && refProp(element),
+          // TODO: is this necessary? since when portalled, this won't render anyway right?
+          ref: (element: HTMLDivElement) => !options.portal && refProp(element),
         },
         props,
       );
@@ -188,9 +263,9 @@ export interface PortalOptions<_T extends ValidComponent = TagName>
    * <SolidPortal portalElement={getPortalElement} />
    * ```
    */
-  portalElement?: // TODO: is the "null" necessary? is the "element" argument necessary?
+  portalElement?: // TODO: is the "null" necessary?
   // TODO: previous callback signature: ((element: HTMLElement) => HTMLElement | null)
-  (() => HTMLElement) | HTMLElement;
+  ((element: HTMLElement) => HTMLElement | undefined) | HTMLElement;
 }
 
 export type PortalProps<T extends ValidComponent = TagName> = Props<
