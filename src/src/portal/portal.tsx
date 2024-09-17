@@ -7,6 +7,7 @@ import {
   restoreFocusIn,
 } from "@ariakit/core/utils/focus";
 import { combineProps } from "@solid-primitives/props";
+import { type MaybeAccessor, access } from "@solid-primitives/utils";
 import {
   Match,
   Show,
@@ -27,6 +28,10 @@ import { PortalContext } from "./portal-context.tsx";
 const TagName = "div" satisfies ValidComponent;
 type TagName = typeof TagName;
 type HTMLType = HTMLElementTagNameMap[TagName];
+
+function getRootElement(element?: Element | null) {
+  return getDocument(element).body;
+}
 
 function queueFocus(element?: HTMLElement | null) {
   queueMicrotask(() => {
@@ -178,7 +183,10 @@ export const usePortal = createHook<TagName, PortalOptions>(
         );
         element = stableAccessor(element, (el) => (
           <Show when={portalNode.value} fallback={el()}>
-            <SolidPortal ref={portalNode.set} mount={portalNode.value}>
+            <SolidPortal
+              ref={portalNode.set}
+              mount={access(options.portalElement) ?? getRootElement()}
+            >
               {el()}
             </SolidPortal>
           </Show>
@@ -428,10 +436,7 @@ export interface PortalOptions<_T extends ValidComponent = TagName>
    * <Portal portalElement={getPortalElement} />
    * ```
    */
-  portalElement?:
-    | ((element: HTMLElement) => HTMLElement | undefined)
-    | HTMLElement
-    | undefined;
+  portalElement?: MaybeAccessor<HTMLElement | undefined>;
 }
 
 export type PortalProps<T extends ValidComponent = TagName> = Props<
