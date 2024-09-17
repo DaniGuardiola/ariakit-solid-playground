@@ -13,9 +13,7 @@ import {
   Switch,
   type ValidComponent,
   createEffect,
-  createEffect,
   onCleanup,
-  untrack,
   useContext,
 } from "solid-js";
 import { Portal as SolidPortal } from "solid-js/web";
@@ -29,30 +27,6 @@ import { PortalContext } from "./portal-context.tsx";
 const TagName = "div" satisfies ValidComponent;
 type TagName = typeof TagName;
 type HTMLType = HTMLElementTagNameMap[TagName];
-
-function getRootElement(element?: Element | null) {
-  return getDocument(element).body;
-}
-
-function getPortalElement(
-  element: HTMLElement,
-  portalElement: PortalOptions["portalElement"],
-) {
-  if (!portalElement) {
-    return getDocument(element).createElement("div");
-  }
-  if (typeof portalElement === "function") {
-    return portalElement(element);
-  }
-  return portalElement;
-}
-
-function getRandomId(prefix = "id") {
-  return `${prefix ? `${prefix}-` : ""}${Math.random()
-    .toString(36)
-    // TODO: (react) deprecated?
-    .substr(2, 6)}`;
-}
 
 function queueFocus(element?: HTMLElement | null) {
   queueMicrotask(() => {
@@ -107,47 +81,6 @@ export const usePortal = createHook<TagName, PortalOptions>(
         debugSet(innerBeforeNode, "innerBeforeNode");
         debugSet(innerAfterNode, "innerAfterNode");
         debugSet(outerAfterNode, "outerAfterNode");
-      });
-
-      // Create the portal node and attach it to the DOM.
-      createEffect(() => {
-        // TODO: is untrack necessary?
-        const element = untrack(() => ref.value);
-        const { portal, portalElement, portalRef } = options;
-        // TODO: context would also be a reactive dep if accessor
-        if (!element || !portal) {
-          portalNode.reset();
-          return;
-        }
-        const portalEl = getPortalElement(element, portalElement);
-        // TODO: (original) Warn about portals as the document.body element.
-        if (!portalEl) {
-          portalNode.reset();
-          return;
-        }
-        portalEl.dataset.name2 = 'portalEl'
-        const isPortalInDocument = portalEl.isConnected;
-        if (!isPortalInDocument) {
-          const rootElement = context || getRootElement(element);
-          rootElement.appendChild(portalEl);
-        }
-        // If the portal element doesn't have an id already, set one.
-        if (!portalEl.id) {
-          // Use the element's id so rendering <Portal id="some-id" /> will
-          // produce predictable results.
-          portalEl.id = element.id ? `portal/${element.id}` : getRandomId();
-        }
-        // Set the internal portal node state and the portalRef prop.
-        portalNode.set(portalEl);
-        portalRef?.(portalEl);
-        // If the portal element was already in the document, we don't need to
-        // remove it when the element is unmounted, so we just return.
-        if (isPortalInDocument) return;
-        // Otherwise, we need to remove the portal from the DOM.
-        onCleanup(() => {
-          portalEl.remove();
-          portalRef?.(undefined);
-        });
       });
 
       // Create the anchor portal node and attach it to the DOM.
@@ -245,7 +178,13 @@ export const usePortal = createHook<TagName, PortalOptions>(
         );
         element = stableAccessor(element, (el) => (
           <Show when={portalNode.value} fallback={el()}>
-            <SolidPortal mount={portalNode.value}>{el()}</SolidPortal>
+            <SolidPortal
+              // TODO: potentially use mergeRefs, but make sure it's not too much extra code
+              {...combineProps({ ref: ref.set }, { ref: props.ref })}
+              mount={portalNode.value}
+            >
+              {el()}
+            </SolidPortal>
           </Show>
         ));
 
@@ -275,8 +214,8 @@ export const usePortal = createHook<TagName, PortalOptions>(
               />
             </Show>
             <Show when={options.preserveTabOrder}>
-              // We're using position: fixed here so that the browser doesn't //
-              add margin to the element when setting gap on a parent element.
+              {/* We're using position: fixed here so that the browser doesn't
+              add margin to the element when setting gap on a parent element. */}
               <span
                 aria-owns={portalNode.value?.id}
                 style={{ position: "fixed" }}
