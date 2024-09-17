@@ -124,6 +124,12 @@ const App: Component = () => {
         ref={(el) => el && (el.dataset.name = 'ref')}>
         hello! i am portalled to body!!!
       </Portal>
+      <Portal
+        data-portal-component
+        portalRef={(el) => el && (el.dataset.name = 'portal-ref')}
+        ref={(el) => el && (el.dataset.name = 'ref')}>
+        hello! i am portalled to body too!!!
+      </Portal>
       <h2>Portal (disabled)</h2>
       <Portal
         portal={false}
