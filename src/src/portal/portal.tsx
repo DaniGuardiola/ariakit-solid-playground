@@ -96,7 +96,7 @@ export const usePortal = createHook<TagName, PortalOptions>(
         { value }: { value: HTMLElement | undefined },
         name: string,
       ) {
-        if (value) value.dataset["data-el"] = name;
+        if (value) value.dataset.name = name;
       }
       createEffect(() => {
         debugSet(ref, "ref");
