@@ -106,7 +106,14 @@ export const usePortal = createHook<TagName, PortalOptions>(
         debugSet(innerBeforeNode, "innerBeforeNode");
         debugSet(innerAfterNode, "innerAfterNode");
         debugSet(outerAfterNode, "outerAfterNode");
-        debugSet({ value: () => options.portalElement }, "portalElement");
+        debugSet(
+          {
+            get value() {
+              return options.portalElement;
+            },
+          },
+          "portalElement",
+        );
       });
 
       // Create the portal node and attach it to the DOM.
