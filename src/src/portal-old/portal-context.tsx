@@ -16,6 +16,5 @@ import { createContext } from "solid-js";
  * }
  * ```
  */
-// TODO: probably should be () => HTMLElement | undefined
-// or MaybeAccessor<HTMLElement | undefined>
+// TODO: should it be () => HTMLElement?
 export const PortalContext = createContext<HTMLElement>();
