@@ -11,6 +11,9 @@ dependencies:
   '@solid-primitives/props':
     specifier: ^3.1.11
     version: 3.1.11(solid-js@1.8.22)
+  '@solid-primitives/refs':
+    specifier: ^1.0.8
+    version: 1.0.8(solid-js@1.8.22)
   '@solid-primitives/utils':
     specifier: ^6.2.3
     version: 6.2.3(solid-js@1.8.22)
@@ -598,6 +601,15 @@ packages:
 
   /@solid-primitives/props@3.1.11(solid-js@1.8.22):
     resolution: {integrity: sha512-jZAKWwvDRHjiydIumDgMj68qviIbowQ1ci7nkEAgzgvanNkhKSQV8iPgR2jMk1uv7S2ZqXYHslVQTgJel/TEyg==}
+    peerDependencies:
+      solid-js: ^1.6.12
+    dependencies:
+      '@solid-primitives/utils': 6.2.3(solid-js@1.8.22)
+      solid-js: 1.8.22
+    dev: false
+
+  /@solid-primitives/refs@1.0.8(solid-js@1.8.22):
+    resolution: {integrity: sha512-+jIsWG8/nYvhaCoG2Vg6CJOLgTmPKFbaCrNQKWfChalgUf9WrVxWw0CdJb3yX15n5lUcQ0jBo6qYtuVVmBLpBw==}
     peerDependencies:
       solid-js: ^1.6.12
     dependencies:

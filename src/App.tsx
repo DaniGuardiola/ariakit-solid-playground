@@ -104,17 +104,33 @@ const App: Component = () => {
       <Separator />
       <Separator orientation='vertical' />
       <h2>Portal (declaration)</h2>
-      <Portal portalElement={() => portalTargetRef}>
+      <Portal
+        portalElement={portalTargetRef}
+        data-portal-component
+        portalRef={(el) => el && (el.dataset.name = 'portal-ref')}
+        ref={(el) => el && (el.dataset.name = 'ref')}>
         <div data-inside-portal>hello! i am portalled!!!</div>
       </Portal>
-      <Portal portalElement={() => portalTargetRef}>
+      <Portal
+        portalElement={portalTargetRef}
+        data-portal-component
+        portalRef={(el) => el && (el.dataset.name = 'portal-ref')}
+        ref={(el) => el && (el.dataset.name = 'ref')}>
         hello! i am portalled too!!!
       </Portal>
-      <Portal>
+      <Portal
+        data-portal-component
+        portalRef={(el) => el && (el.dataset.name = 'portal-ref')}
+        ref={(el) => el && (el.dataset.name = 'ref')}>
         hello! i am portalled to body!!!
       </Portal>
       <h2>Portal (disabled)</h2>
-      <Portal portal={false} portalElement={portalTargetRef}>
+      <Portal
+        portal={false}
+        portalElement={portalTargetRef}
+        data-portal-component
+        portalRef={(el) => el && (el.dataset.name = 'portal-ref')}
+        ref={(el) => el && (el.dataset.name = 'ref')}>
         hello! i am NOT portalled!!!
       </Portal>
     </div>
