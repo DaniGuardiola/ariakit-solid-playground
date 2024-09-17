@@ -13,6 +13,7 @@ import {
   Switch,
   type ValidComponent,
   createEffect,
+  createEffect,
   onCleanup,
   untrack,
   useContext,
@@ -106,14 +107,6 @@ export const usePortal = createHook<TagName, PortalOptions>(
         debugSet(innerBeforeNode, "innerBeforeNode");
         debugSet(innerAfterNode, "innerAfterNode");
         debugSet(outerAfterNode, "outerAfterNode");
-        debugSet(
-          {
-            get value() {
-              return options.portalElement;
-            },
-          },
-          "portalElement",
-        );
       });
 
       // Create the portal node and attach it to the DOM.
@@ -132,6 +125,7 @@ export const usePortal = createHook<TagName, PortalOptions>(
           portalNode.reset();
           return;
         }
+        portalEl.dataset.name2 = 'portalEl'
         const isPortalInDocument = portalEl.isConnected;
         if (!isPortalInDocument) {
           const rootElement = context || getRootElement(element);
