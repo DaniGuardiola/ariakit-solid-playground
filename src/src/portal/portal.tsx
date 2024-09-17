@@ -92,6 +92,22 @@ export const usePortal = createHook<TagName, PortalOptions>(
       const innerAfterNode = createRef<HTMLSpanElement>();
       const outerAfterNode = createRef<HTMLSpanElement>();
 
+      function debugSet(
+        { value }: { value: HTMLElement | undefined },
+        name: string,
+      ) {
+        if (value) value.dataset["data-el"] = name;
+      }
+      createEffect(() => {
+        debugSet(ref, "ref");
+        debugSet(portalNode, "portalNode");
+        debugSet(anchorPortalNode, "anchorPortalNode");
+        debugSet(outerBeforeNode, "outerBeforeNode");
+        debugSet(innerBeforeNode, "innerBeforeNode");
+        debugSet(innerAfterNode, "innerAfterNode");
+        debugSet(outerAfterNode, "outerAfterNode");
+      });
+
       // Create the portal node and attach it to the DOM.
       createEffect(() => {
         // TODO: is untrack necessary?
