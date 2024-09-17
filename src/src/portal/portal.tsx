@@ -7,6 +7,7 @@ import {
   type ValidComponent,
   createEffect,
   onCleanup,
+  untrack,
 } from "solid-js";
 import { Portal as SolidPortal } from "solid-js/web";
 import { createRef, wrapInstance } from "../utils/misc.ts";
@@ -61,7 +62,13 @@ export const usePortal = createHook<TagName, PortalOptions>(
 
       // Create the portal node and attach it to the DOM.
       createEffect(() => {
-        const element = ref.value;
+        const element = untrack(() => ref.value);
+        console.log({
+          element,
+          portal: options.portal,
+          portalElement: options.portalElement,
+          portalNode: portalNode.value,
+        });
         if (!element || !options.portal) {
           portalNode.reset();
           return;
@@ -103,11 +110,24 @@ export const usePortal = createHook<TagName, PortalOptions>(
           >
             <Match when={!options.portal}>{wrapperProps.children}</Match>
             <Match when={options.portal && !portalNode.value}>
-              <p>TODO: span thingy?</p>
+              {/* If the element should be rendered within a portal, but the portal
+              node is not yet in the DOM, we'll return an empty div element. We
+              assign the id to the element so we can use it to set the portal id
+              later on. We're using position: fixed here so that the browser
+              doesn't add margin to the element when setting gap on a parent
+              element. */}
+              <span
+                ref={refProp}
+                id={props.id}
+                style={{ position: "fixed" }}
+                hidden
+              />
             </Match>
             <Match when={options.portal && portalNode.value}>
               {/* TODO: preserveTabOrder thing */}
-              <SolidPortal ref={refProp}>{props.children}</SolidPortal>
+              <SolidPortal ref={refProp} mount={portalNode.value}>
+                {props.children}
+              </SolidPortal>
             </Match>
           </Switch>
         );
