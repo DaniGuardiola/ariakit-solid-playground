@@ -63,12 +63,6 @@ export const usePortal = createHook<TagName, PortalOptions>(
       // Create the portal node and attach it to the DOM.
       createEffect(() => {
         const element = untrack(() => ref.value);
-        console.log({
-          element,
-          portal: options.portal,
-          portalElement: options.portalElement,
-          portalNode: portalNode.value,
-        });
         if (!element || !options.portal) {
           portalNode.reset();
           return;
