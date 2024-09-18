@@ -1,8 +1,17 @@
 import { getDocument } from "@ariakit/core/utils/dom";
+import { isFocusEventOutside } from "@ariakit/core/utils/events";
+import {
+  disableFocusIn,
+  getNextTabbable,
+  getPreviousTabbable,
+  restoreFocusIn,
+} from "@ariakit/core/utils/focus";
 import { combineProps } from "@solid-primitives/props";
 import { mergeRefs } from "@solid-primitives/refs";
 import {
+  type JSX,
   Match,
+  Show,
   Switch,
   type ValidComponent,
   createEffect,
@@ -10,6 +19,7 @@ import {
   untrack,
 } from "solid-js";
 import { Portal as SolidPortal } from "solid-js/web";
+import { FocusTrap } from "../focus-trap/focus-trap.tsx";
 import { createRef, wrapInstance } from "../utils/misc.ts";
 import { createHook, createInstance, withOptions } from "../utils/system.tsx";
 import type { Options, Props } from "../utils/types.ts";
@@ -42,6 +52,12 @@ function getRandomId(prefix = "id") {
     .substr(2, 6)}`;
 }
 
+function queueFocus(element?: HTMLElement | null) {
+  queueMicrotask(() => {
+    element?.focus();
+  });
+}
+
 /**
  * Returns props to create a `Portal` component.
  * @see https://solid.ariakit.org/components/portal
@@ -63,8 +79,19 @@ export const usePortal = createHook<TagName, PortalOptions>(
     },
     function usePortal(props, options) {
       const ref = createRef<HTMLType>();
-      const refProp = mergeRefs(ref.set, options.ref);
+      const refProp = mergeRefs(ref.set, options.ref, (element) => {
+        // Since the wrapper div element is created by Solid, there is no
+        // way to forward the props to it. We set the id manually here,
+        // as other features depend on it.
+        // TODO: ensure this is actually true
+        if (props.id) element.id = props.id;
+      });
       const portalNode = createRef<HTMLElement>();
+
+      const outerBeforeRef = createRef<HTMLSpanElement>();
+      const innerBeforeRef = createRef<HTMLSpanElement>();
+      const innerAfterRef = createRef<HTMLSpanElement>();
+      const outerAfterRef = createRef<HTMLSpanElement>();
 
       // Create the portal node and attach it to the DOM.
       createEffect(() => {
@@ -90,7 +117,12 @@ export const usePortal = createHook<TagName, PortalOptions>(
         if (!portalEl.id) {
           // Use the element's id so rendering <Portal id="some-id" /> will
           // produce predictable results.
-          portalEl.id = element.id ? `portal/${element.id}` : getRandomId();
+          portalEl.id =
+            // TODO: added options.portalElement check for parity with observed
+            // behavior in Ariakit React, but is this necessary?
+            element.id && !options.portalElement
+              ? `portal/${element.id}`
+              : getRandomId();
         }
         // Set the internal portal node state and the portalRef prop.
         portalNode.set(portalEl);
@@ -105,16 +137,140 @@ export const usePortal = createHook<TagName, PortalOptions>(
         });
       });
 
+      // When preserveTabOrder is true, make sure elements inside the portal
+      // element are tabbable only when the portal has already been focused,
+      // either by tabbing into a focus trap element outside or using the mouse.
+      createEffect(() => {
+        const { value: portalNodeEl } = portalNode;
+        if (!portalNodeEl) return;
+        if (!options.preserveTabOrder) return;
+        let raf = 0;
+        const onFocus = (event: FocusEvent) => {
+          if (!isFocusEventOutside(event)) return;
+          const focusing = event.type === "focusin";
+          cancelAnimationFrame(raf);
+          if (focusing) {
+            return restoreFocusIn(portalNodeEl);
+          }
+          // Wait for the next frame to allow tabindex changes after the focus
+          // event.
+          raf = requestAnimationFrame(() => {
+            disableFocusIn(portalNodeEl, true);
+          });
+        };
+        // Listen to the event on the capture phase so they run before the focus
+        // trap elements onFocus prop is called.
+        portalNodeEl.addEventListener("focusin", onFocus, true);
+        portalNodeEl.addEventListener("focusout", onFocus, true);
+        onCleanup(() => {
+          cancelAnimationFrame(raf);
+          portalNodeEl.removeEventListener("focusin", onFocus, true);
+          portalNodeEl.removeEventListener("focusout", onFocus, true);
+        });
+      });
+
       props = wrapInstance(props, (wrapperProps) => {
         // TODO: add context support
+
+        const withPreserveTabOrder = (children: () => JSX.Element) => (
+          <>
+            <Show when={options.preserveTabOrder && portalNode.value}>
+              <FocusTrap
+                ref={innerBeforeRef.set}
+                data-focus-trap={props.id}
+                class="__focus-trap-inner-before"
+                onFocus={(event) => {
+                  if (isFocusEventOutside(event, portalNode.value)) {
+                    queueFocus(getNextTabbable());
+                  } else {
+                    queueFocus(outerBeforeRef.value);
+                  }
+                }}
+              />
+            </Show>
+            {children()}
+            <Show when={options.preserveTabOrder && portalNode.value}>
+              <FocusTrap
+                ref={innerAfterRef.set}
+                data-focus-trap={props.id}
+                class="__focus-trap-inner-after"
+                onFocus={(event) => {
+                  if (isFocusEventOutside(event, portalNode.value)) {
+                    queueFocus(getPreviousTabbable());
+                  } else {
+                    queueFocus(outerAfterRef.value);
+                  }
+                }}
+              />
+            </Show>
+          </>
+        );
+
+        const preserveTabOrderElement = () => (
+          <>
+            <Show when={options.preserveTabOrder && portalNode.value}>
+              <FocusTrap
+                ref={outerBeforeRef.set}
+                data-focus-trap={props.id}
+                class="__focus-trap-outer-before"
+                onFocus={(event) => {
+                  // If the event is coming from the outer after focus trap, it
+                  // means there's no tabbable element inside the portal. In
+                  // this case, we don't focus the inner before focus trap, but
+                  // the previous tabbable element outside the portal.
+                  const fromOuter = event.relatedTarget === outerAfterRef.value;
+                  if (
+                    !fromOuter &&
+                    isFocusEventOutside(event, portalNode.value)
+                  ) {
+                    queueFocus(innerBeforeRef.value);
+                  } else {
+                    queueFocus(getPreviousTabbable());
+                  }
+                }}
+              />
+            </Show>
+            <Show when={options.preserveTabOrder}>
+              {/* We're using position: fixed here so that the browser doesn't
+              add margin to the element when setting gap on a parent element. */}
+              <span
+                aria-owns={portalNode.value?.id}
+                style={{ position: "fixed" }}
+              />
+            </Show>
+            <Show when={options.preserveTabOrder && portalNode.value}>
+              <FocusTrap
+                ref={outerAfterRef.set}
+                data-focus-trap={props.id}
+                class="__focus-trap-outer-after"
+                onFocus={(event) => {
+                  if (isFocusEventOutside(event, portalNode.value)) {
+                    queueFocus(innerAfterRef.value);
+                  } else {
+                    const nextTabbable = getNextTabbable();
+                    // If the next tabbable element is the inner before focus
+                    // trap, this means we're at the end of the document or the
+                    // portal was placed right after the original spot in the
+                    // React tree. We need to wait for the next frame so the
+                    // preserveTabOrder effect can run and disable the inner
+                    // before focus trap. If there's no tabbable element after
+                    // that, the focus will stay on this element.
+                    if (nextTabbable === innerBeforeRef.value) {
+                      requestAnimationFrame(() => getNextTabbable()?.focus());
+                      return;
+                    }
+                    queueFocus(nextTabbable);
+                  }
+                }}
+              />
+            </Show>
+          </>
+        );
+
         return (
-          <Switch
-            fallback={() => {
-              throw new Error("this should never happen");
-            }}
-          >
+          <Switch>
             <Match when={!options.portal}>{wrapperProps.children}</Match>
-            <Match when={options.portal && !portalNode.value}>
+            <Match when={!portalNode.value}>
               {/* If the element should be rendered within a portal, but the portal
               node is not yet in the DOM, we'll return an empty div element. We
               assign the id to the element so we can use it to set the portal id
@@ -128,15 +284,16 @@ export const usePortal = createHook<TagName, PortalOptions>(
                 hidden
               />
             </Match>
-            <Match when={options.portal && portalNode.value}>
-              {/* TODO: preserveTabOrder thing */}
-              <SolidPortal ref={refProp} mount={portalNode.value}>
-                {props.children}
-              </SolidPortal>
+            <Match when={portalNode.value}>
+              {preserveTabOrderElement()}
+              {withPreserveTabOrder(() => (
+                <SolidPortal ref={refProp} mount={portalNode.value}>
+                  {props.children}
+                </SolidPortal>
+              ))}
             </Match>
           </Switch>
         );
-        // TODO: preserveTabOrderElement and the rest
       });
 
       props = combineProps(
