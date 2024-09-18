@@ -17,11 +17,11 @@ import {
   createEffect,
   onCleanup,
 } from "solid-js";
-import { Portal as SolidPortal } from "solid-js/web";
 import { FocusTrap } from "../focus-trap/focus-trap.tsx";
 import { createRef, wrapInstance } from "../utils/misc.ts";
 import { createHook, createInstance, withOptions } from "../utils/system.tsx";
 import type { Options, Props } from "../utils/types.ts";
+import { Portal as SolidPortal } from "./portal-solid.tsx";
 
 const TagName = "div" satisfies ValidComponent;
 type TagName = typeof TagName;
@@ -179,11 +179,13 @@ export const usePortal = createHook<TagName, PortalOptions>(
                 data-focus-trap={props.id}
                 class="__focus-trap-inner-before"
                 onFocus={(event) => {
-                  if (isFocusEventOutside(event, portalNode.current)) {
-                    queueFocus(getNextTabbable());
-                  } else {
-                    queueFocus(outerBeforeRef.current);
-                  }
+                  queueMicrotask(() => {
+                    if (isFocusEventOutside(event, portalNode.current)) {
+                      queueFocus(getNextTabbable());
+                    } else {
+                      queueFocus(outerBeforeRef.current);
+                    }
+                  });
                 }}
               />
             </Show>
@@ -194,11 +196,13 @@ export const usePortal = createHook<TagName, PortalOptions>(
                 data-focus-trap={props.id}
                 class="__focus-trap-inner-after"
                 onFocus={(event) => {
-                  if (isFocusEventOutside(event, portalNode.current)) {
-                    queueFocus(getPreviousTabbable());
-                  } else {
-                    queueFocus(outerAfterRef.current);
-                  }
+                  queueMicrotask(() => {
+                    if (isFocusEventOutside(event, portalNode.current)) {
+                      queueFocus(getPreviousTabbable());
+                    } else {
+                      queueFocus(outerAfterRef.current);
+                    }
+                  });
                 }}
               />
             </Show>
@@ -458,8 +462,6 @@ export type PortalProps<T extends ValidComponent = TagName> = Props<
 >;
 
 // TODO: remaining stuff:
-// 1. preserveTabOrder is not working properly when the effect that disables focus in
-//    the portal is uncommented.
-// 2. upon refresh in the stackblitz, the order of the portal elements changes. seems
-//    to follow a consistent pattern, and doesn't happen just on reload. Weird.
-// 3. implement preserveTabOrderAnchor
+// 1. upon refresh in the stackblitz, the order of the portal elements changes. seems
+//    to follow a consistent pattern, and doesn't happen on reload. Weird.
+// 2. implement preserveTabOrderAnchor
