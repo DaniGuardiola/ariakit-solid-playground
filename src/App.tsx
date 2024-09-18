@@ -105,6 +105,7 @@ const App: Component = () => {
       <Separator orientation='vertical' />
       <h2>Portal (declaration)</h2>
       <Portal
+        id="test-id"
         portalElement={portalTargetRef}
         data-portal-component
         portalRef={(el) => el && (el.dataset.name = 'portal-ref')}
@@ -139,6 +140,22 @@ const App: Component = () => {
         ref={(el) => el && (el.dataset.name = 'ref')}>
         hello! i am NOT portalled!!!
       </Portal>
+      <Portal
+        id="my-id"
+        portalRef={(el) => el && (el.dataset.name = 'portal-ref')}
+        ref={(el) => el && (el.dataset.name = 'ref')}>
+        hello! i have a specific id!!!
+      </Portal>
+      <button>1</button>
+      <Portal
+        preserveTabOrder
+        portalRef={(el) => el && (el.dataset.name = 'portal-ref')}
+        ref={(el) => el && (el.dataset.name = 'ref')}>
+        i respect tab order
+        <button>2</button>    
+        <button>3</button>
+      </Portal>
+      <button>4</button>
     </div>
   );
 };
