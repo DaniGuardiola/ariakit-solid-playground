@@ -9,6 +9,7 @@ import {
   createUniqueId,
   mergeProps,
   splitProps,
+  untrack,
 } from "solid-js";
 import type { WrapInstance, WrapInstanceValue } from "./types.ts";
 
@@ -134,6 +135,11 @@ export type RefStore<T> = {
    */
   value: T;
   /**
+   * The current value of the ref. It is a non-reactive getter, wrapped with
+   * the `untrack` function.
+   */
+  current: T;
+  /**
    * The setter function for the ref.
    */
   set: Setter<T>;
@@ -165,6 +171,9 @@ export function createRef<T>(initialValue?: any): any {
   return {
     get value() {
       return value();
+    },
+    get current() {
+      return untrack(() => value());
     },
     set,
     reset: () => set(initialValue),
