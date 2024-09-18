@@ -287,11 +287,9 @@ export const usePortal = createHook<TagName, PortalOptions>(
             </Match>
             <Match when={portalNode.value}>
               {preserveTabOrderElement()}
-              {withPreserveTabOrder(() => (
-                <SolidPortal ref={refProp} mount={portalNode.value}>
-                  {props.children}
-                </SolidPortal>
-              ))}
+              <SolidPortal ref={refProp} mount={portalNode.value}>
+                {withPreserveTabOrder(() => props.children)}
+              </SolidPortal>
             </Match>
           </Switch>
         );
