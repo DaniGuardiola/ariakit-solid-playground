@@ -1,28 +1,39 @@
-import { createEffect, createSignal, type Component } from 'solid-js';
+import { createEffect, createSignal, type Component } from "solid-js";
 
-import './App.css';
-import { Role } from './src/role/role';
-import { As } from './src/as/as';
-import { VisuallyHidden } from './src/visually-hidden/visually-hidden';
-import { FocusTrap, useFocusTrap } from './src/focus-trap/focus-trap';
-import { HeadingLevel } from './src/heading/heading-level';
-import { Heading } from './src/heading/heading';
-import { Group } from './src/group/group';
-import { GroupLabel } from './src/group/group-label';
-import { Separator } from './src/separator/separator';
-import { FocusTrapRegion } from './src/focus-trap/focus-trap-region';
-import { Portal } from './src/portal/portal';
+import "./App.css";
+import { Role } from "@ariakit/solid";
+import { As } from "@ariakit/solid";
+import { VisuallyHidden } from "@ariakit/solid";
+import {
+  FocusTrap,
+  useFocusTrap,
+} from "@ariakit/solid-core/focus-trap/focus-trap";
+import { HeadingLevel } from "@ariakit/solid";
+import { Heading } from "@ariakit/solid";
+import { Group } from "@ariakit/solid";
+import { GroupLabel } from "@ariakit/solid";
+import { Separator } from "@ariakit/solid";
+import { FocusTrapRegion } from "@ariakit/solid";
+
+declare module "solid-js" {
+  namespace JSX {
+    interface HTMLAttributes<T> {
+      [key: `data-${string}`]: string;
+    }
+  }
+}
 
 const App: Component = () => {
   const [dynamic, setDynamic] = createSignal(true);
-  let focusTargetRef!: HTMLButtonElement
-  let focusTarget2Ref!: HTMLButtonElement
-  const [focusTrapRegionEnabled, setFocusTrapRegionEnabled] = createSignal(false)
-  let headingRef!: HTMLDivElement
+  let focusTargetRef!: HTMLButtonElement;
+  let focusTarget2Ref!: HTMLButtonElement;
+  const [focusTrapRegionEnabled, setFocusTrapRegionEnabled] =
+    createSignal(false);
+  let headingRef!: HTMLDivElement;
   createEffect(() => {
-    console.log({headingRef})
-  })
-  let portalTargetRef!: HTMLDivElement
+    console.log({ headingRef });
+  });
+  let portalTargetRef!: HTMLDivElement;
   return (
     <div>
       <h1>LEGEND (color by tag)</h1>
@@ -38,10 +49,23 @@ const App: Component = () => {
       <Role.span
         render={<As.button>span + button (with children)</As.button>}
       />
-      <Role.span render={<As.button>if you're reading this, it worked (children override)</As.button>}>
+      <Role.span
+        render={
+          <As.button>
+            if you're reading this, it worked (children override)
+          </As.button>
+        }
+      >
         this shouldn't be visible
       </Role.span>
-      <Role.span data-test="if you're reading this, it worked" render={<As.button data-test={undefined}>data-test: undefined (inspect me)</As.button>} />
+      <Role.span
+        data-test="if you're reading this, it worked"
+        render={
+          <As.button data-test={undefined}>
+            data-test: undefined (inspect me)
+          </As.button>
+        }
+      />
       <Role.button>button</Role.button>
       <Role.button render={<As.span>button + span</As.span>} />
       <h2>Render with "As" - class merging</h2>
@@ -62,7 +86,18 @@ const App: Component = () => {
         }
       />
       <h2>Render with function</h2>
-      <Role.div data-test="a" render={props => <button type="button" {...props} data-test={`${props['data-test']} + b`} />} >I should be a button with type="button" and data-test="a + b"</Role.div>
+      <Role.div
+        data-test="a"
+        render={(props) => (
+          <button
+            type="button"
+            {...props}
+            data-test={`${props["data-test"]} + b`}
+          />
+        )}
+      >
+        I should be a button with type="button" and data-test="a + b"
+      </Role.div>
       <h2>Visually hidden (inspect)</h2>
       Here: <VisuallyHidden>Hello I'm hidden</VisuallyHidden>
       <h2>Focus trap (tab into it)</h2>
@@ -70,11 +105,17 @@ const App: Component = () => {
       <button>decoy button</button>
       <button ref={focusTargetRef!}>focus target!</button>
       <h2>Focus trap but using hook</h2>
-      <Role.span {...useFocusTrap({onFocus: () => focusTarget2Ref.focus()})} />
+      <Role.span
+        {...useFocusTrap({ onFocus: () => focusTarget2Ref.focus() })}
+      />
       <button>decoy button</button>
       <button ref={focusTarget2Ref!}>focus target!</button>
       <h2>Focus trap region</h2>
-      <button onClick={() => setFocusTrapRegionEnabled(v => !v)}>{focusTrapRegionEnabled() ? "Currently enabled, click to disable":"Currently disabled, click to enable"}</button>
+      <button onClick={() => setFocusTrapRegionEnabled((v) => !v)}>
+        {focusTrapRegionEnabled()
+          ? "Currently enabled, click to disable"
+          : "Currently disabled, click to enable"}
+      </button>
       <FocusTrapRegion enabled={focusTrapRegionEnabled()}>
         <button>click me</button>
         <button>trap focus</button>
@@ -85,12 +126,27 @@ const App: Component = () => {
       <div data-portal-target ref={portalTargetRef} />
       <h2>Headings</h2>
       <HeadingLevel>
-        <Heading ref={headingRef as HTMLHeadingElement} render={<As.div />} >H1?</Heading>
+        <Heading ref={headingRef as HTMLHeadingElement} render={<As.div />}>
+          H1?
+        </Heading>
         <HeadingLevel>
-          <Heading class="a" data-test='outer' onClick={() => console.log("outer")} render={<As.div class="b" data-test='inner' onClick={() => console.log("inner")} />}>H2?</Heading>
-        <HeadingLevel>
-          <Heading>H3?</Heading>
-        </HeadingLevel>
+          <Heading
+            class="a"
+            data-test="outer"
+            onClick={() => console.log("outer")}
+            render={
+              <As.div
+                class="b"
+                data-test="inner"
+                onClick={() => console.log("inner")}
+              />
+            }
+          >
+            H2?
+          </Heading>
+          <HeadingLevel>
+            <Heading>H3?</Heading>
+          </HeadingLevel>
         </HeadingLevel>
       </HeadingLevel>
       <h2>Group</h2>
@@ -102,9 +158,9 @@ const App: Component = () => {
       </Group>
       <h2>Separator</h2>
       <Separator />
-      <Separator orientation='vertical' />
+      <Separator orientation="vertical" />
       <h2>Portal (declaration)</h2>
-      <Portal
+      {/* <Portal
         id="test-id"
         portalElement={portalTargetRef}
         data-portal-component
@@ -154,7 +210,7 @@ const App: Component = () => {
         i respect tab order
         <button>2</button>    
         <button>3</button>
-      </Portal>
+      </Portal> */}
       <button>4</button>
     </div>
   );

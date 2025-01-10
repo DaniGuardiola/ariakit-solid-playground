@@ -15,11 +15,12 @@
     "vite-plugin-solid": "^2.10.2"
   },
   "dependencies": {
-    "@ariakit/core": "^0.4.10",
-    "@solid-primitives/props": "^3.1.11",
-    "@solid-primitives/refs": "^1.0.8",
-    "@solid-primitives/utils": "^6.2.3",
+    "@ariakit/core": "https://pkg.csb.dev/ariakit/ariakit/commit/ac644fd2/@ariakit/core",
+    "@ariakit/react": "https://pkg.csb.dev/ariakit/ariakit/commit/ac644fd2/@ariakit/react",
+    "@ariakit/react-core": "https://pkg.csb.dev/ariakit/ariakit/commit/ac644fd2/@ariakit/react-core",
+    "@ariakit/solid": "https://pkg.csb.dev/ariakit/ariakit/commit/ac644fd2/@ariakit/solid",
+    "@ariakit/solid-core": "https://pkg.csb.dev/ariakit/ariakit/commit/ac644fd2/@ariakit/solid-core",
+    "@ariakit/test": "https://pkg.csb.dev/ariakit/ariakit/commit/ac644fd2/@ariakit/test",
     "solid-js": "^1.8.22"
-  },
-  "packageManager": "pnpm@8.15.3+sha1.64838798f519c18029c1e8a1310e16101fc2eda0"
+  }
 }
