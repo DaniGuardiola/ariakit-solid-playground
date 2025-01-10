@@ -159,8 +159,8 @@ const App: Component = () => {
       <h2>Separator</h2>
       <Separator />
       <Separator orientation="vertical" />
-      <h2>Portal (declaration)</h2>
-      {/* <Portal
+      {/* <h2>Portal (declaration)</h2>
+      <Portal
         id="test-id"
         portalElement={portalTargetRef}
         data-portal-component
@@ -210,8 +210,8 @@ const App: Component = () => {
         i respect tab order
         <button>2</button>    
         <button>3</button>
-      </Portal> */}
-      <button>4</button>
+      </Portal>
+      <button>4</button> */}
     </div>
   );
 };
